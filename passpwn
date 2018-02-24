@@ -1,0 +1,47 @@
+#!/bin/bash
+
+set -eou pipefail
+
+# check_password - Check a pass entry against pwnedpasswords.com.
+#
+# Takes in a pass entry (example: Email/zx2c4.com) and outputs the entries
+# tested and any compromises to stderr.
+function check_password() {
+	sha1=$(pass "${1}" | head -n 1 | sha1sum | tr '[:lower:]' '[:upper:]' | awk -F' ' '{ print $1 }')
+	short=${sha1:0:5}
+
+	echo "${sha1} | ${entry}"
+	resp=$(curl -s -X GET https://api.pwnedpasswords.com/range/${short})
+
+	# Compare local hash against the ones we got from pwnedpasswords.com.
+	for h in $resp; do
+		cleaned_hash=$(echo "${short}${h}" | awk -F: '{ print $1 }')
+
+		if [[ "${cleaned_hash}" == ${sha1} ]]; then
+			(>&2 echo -e "\e[31m!!\e[33m Your password for ${entry} with SHA1 ${sha1} has been compromised!\e[0m")
+		fi
+	done
+}
+
+# Main program.
+#
+# Run through all .gpg files in password store.
+function main() {
+	# Set IFS to be able to cope with spaces in file names.
+	IFS=$'\n'
+
+	for pass_entry in $(pass git ls-files *.gpg); do
+
+		# Support characters with åäö etc..
+		escaped_entry="$(printf %b ${pass_entry})"
+		entry=${escaped_entry%\"}
+		entry=${entry#\"}
+		entry=${entry%.gpg}
+
+		# Check the pass entry.
+		check_password "${entry}"
+	done
+}
+
+# Run the program.
+main
