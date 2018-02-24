@@ -7,7 +7,7 @@ set -eou pipefail
 # Takes in a pass entry (example: Email/zx2c4.com) and outputs the entries
 # tested and any compromises to stderr.
 function check_password() {
-	sha1=$(pass "${1}" | head -n 1 | sha1sum | tr '[:lower:]' '[:upper:]' | awk -F' ' '{ print $1 }')
+	sha1=$(pass -- "${1}" | head -n 1 | sha1sum | tr '[:lower:]' '[:upper:]' | awk -F' ' '{ print $1 }')
 	short=${sha1:0:5}
 
 	echo "${sha1} | ${entry}"
