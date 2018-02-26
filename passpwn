@@ -7,7 +7,8 @@ set -eou pipefail
 # Takes in a pass entry (example: Email/zx2c4.com) and outputs the entries
 # tested and any compromises to stderr.
 function check_password() {
-	password=$(pass -- "${1}" | head -n 1)
+	password=${1}
+	verbose_log "Checking entry ${password}"
 	sha1=$(echo -n "${password}" | sha1sum | tr '[:lower:]' '[:upper:]' | awk -F' ' '{ print $1 }')
 	short=${sha1:0:5}
 
@@ -38,11 +39,54 @@ function main() {
 		entry=${escaped_entry%\"}
 		entry=${entry#\"}
 		entry=${entry%.gpg}
+		verbose_log "Checking password file ${entry}"
 
-		# Check the pass entry.
-		check_password "${entry}"
+		# Check the pass entries:
+		if [ "$FULL_FILE" = true ] ; then
+			while read p; do
+				check_password "${p}"
+			done <<< "$(pass -- "${entry}")"
+		else
+			check_password "$(pass -- "${entry}" | head -n 1)"
+		fi
 	done
 }
+
+# Verbose logging:
+function verbose_log() {
+	if [ "$VERBOSE" = true ] ; then 
+		echo "VERBOSE: ${1}"
+	fi
+}
+
+# Help:
+function usage() { 
+	echo "Usage: $0 [-h] [-v] [-f]" 1>&2; 
+	exit 1; 
+}
+
+# Parse input:
+OPTS=`getopt hvf $*`
+if [ $? != 0 ] ; then 
+	echo "Failed parsing options." >&2 
+	usage
+	exit 1
+fi
+
+eval set -- "$OPTS"
+
+VERBOSE=false
+FULL_FILE=false
+
+while true; do
+	case "$1" in
+		-v )    VERBOSE=true; shift ;;
+		-h )    usage; shift ;;
+		-f )    FULL_FILE=true; shift ;;
+		-- )    shift; break ;;
+		* )     usage; break ;;
+	esac
+done
 
 # Run the program.
 main
