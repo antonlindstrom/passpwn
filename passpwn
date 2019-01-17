@@ -31,7 +31,7 @@ function main() {
 	# Set IFS to be able to cope with spaces in file names.
 	IFS=$'\n'
 
-	for pass_entry in $(pass git ls-files ./*.gpg); do
+	for pass_entry in $(pass git ls-files './*.gpg'); do
 
 		# Support characters with åäö etc..
 		escaped_entry="$(printf %b "${pass_entry}")"
