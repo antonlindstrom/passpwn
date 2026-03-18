@@ -53,7 +53,7 @@ If you find any bugs or want to provide feedback, you can file bugs in the proje
 Author
 ------
 
-This project is maintained by [Anton Lindström](https://www.antonlindstrom.com) ([GitHub](https://github.com/antonlindstrom)
+This project is maintained by [Anton Lindström](https://www.antonlindstrom.com) ([GitHub](https://github.com/antonlindstrom))
 
 License
 -------
