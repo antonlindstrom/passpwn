@@ -15,6 +15,14 @@ A big thanks to haveibeenpwned.com for making this possible in a secure way.
 Usage
 -----
 
+To only see the compromised passwords:
+
+```sh
+./passpwn >/dev/null
+```
+
+The program will print compromised passwords to stderr.
+
 ### With Nix
 
 If you have [Nix](https://nixos.org/) with flakes enabled, you can run passpwn without installing it:
