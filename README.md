@@ -12,6 +12,31 @@ blog](https://blog.agilebits.com/2018/02/22/finding-pwned-passwords-with-1passwo
 
 A big thanks to haveibeenpwned.com for making this possible in a secure way.
 
+Usage
+-----
+
+### With Nix
+
+If you have [Nix](https://nixos.org/) with flakes enabled, you can run passpwn without installing it:
+
+```sh
+nix run github:antonlindstrom/passpwn
+```
+
+Or from a local checkout:
+
+```sh
+nix run .
+```
+
+### Without Nix
+
+Copy or symlink the `passpwn` script to somewhere on your `$PATH`, for example:
+
+```sh
+install -m 755 passpwn ~/.local/bin/passpwn
+```
+
 Reporting bugs
 --------------
 
